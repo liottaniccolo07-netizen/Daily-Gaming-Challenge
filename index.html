@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Titolo tab browser -->
+     <title>🎮 Daily Gaming Challenge</title>
+
+     <link rel="stylesheet" href="style.css">
+
+     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="loading-screen" id="loading-screen">
+        <div class="loading-content">
+            <h1 class="loading-title">🎮</h1>
+            <p class="loading-text">Caricamento sfida...</p>
+            <div class="loading-bar">
+                <div class="loading-bar-fill"></div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">🎮 DAILY GAMING CHALLENGE</h1>
+            <p class="subtitle">Una nuova sfida ogni giorno. Sei pronto?</p>
+            
+            <div class="streak-badge" id="streak-badge">
+                🔥 Streak: <span id="streak-count">0</span> giorni
+            </div>
+        </header>
+
+        <div class="game-buttons">
+            <button class="game-btn active" onclick="selectGame('tutti')" id="btn-tutti">
+                🎯 Tutti
+            </button>
+            <button class="game-btn" onclick="selectGame('fortnite')" id="btn-fortnite">
+                🏗️ Fortnite
+            </button>
+            <button class="game-btn" onclick="selectGame('valorant')" id="btn-valorant">
+                🔫 Valorant    
+            </button>
+            <button class="game-btn" onclick="selectGame('minecraft')" id="btn-minecraft">
+                ⛏️ Minecraft
+            </button>
+            <button class="game-btn" onclick="selectGame('lol')" id="btn-lol">
+            <button class="game-btn" onclick="selectGame('cod')" id="btn-cod">
+                💀 CoD     
+            </button>
+            <button class="game-btn" onclick="selectGame('rocketleague')" id="btn-rocketleague">
+                🚗 Rocket League 
+            </button>
+            <button class="game-btn" onclick="selectGame('apexlegends')" id="btn-apexlegends">
+                🦅 Apex Legends
+            </button>
+            </div>
+        </div>
+        <div class="date-box">
+            <p id="today-date">📅 Caricamento...</p>
+        </div>
+        <div class="challenge-card">
+            <span class="difficulty" id="difficulty">⏳ Caricamento...</span>
+            <h2 class="challenge-title" id="challenge-title">Caricamento sfida...</h2>
+            <p class="challenge-desc" id="challenge-desc">Attendere...</p>
+        </div>
+
+        <div class="success-message" id="success-message">
+            <p>🎉 SFIDA COMPLETATA! Ben fatto soldato!</p>
+        </div>
+        <div class="buttons">
+            <button class="btn btn-complete" onclick="completeChallenge()">
+                ✅ Completata!
+            </button>
+            <button class="btn btn-random" onclick="randomChallenge()">
+                🔁 Sfida Casuale
+            </button>
+            <button class="btn btn-skip" onclick="skipChallenge()">
+                ⏭️ Salta
+            </button>
+        </div>
+        
+        <div class="xp-section">
+            <div class="rank-display">
+                <span class="rank-icon" id="rank-icon">🥉</span>
+                <span class="rank-name" id="rank-name">Bronzo</span>
+            </div>
+
+            <p class="level" id="level">Livello: 1</p>
+            
+            <div class="xp-bar-container">
+                <div class="xp-bar" id="xp-bar"></div>
+            </div>
+
+            <p class="xp-text" id="xp-text">XP: 0 / 100</p>
+        </div>
+
+        <div class="badges-section">
+            <h3 class="section-title">🏆 Achievement</h3>
+
+            <div class="badges-grid">
+
+                <div class="badge locked" id="badge-first">
+                    <span class="badge-icon">⚔️</span>
+                    <span class="badge-name">Prima Sfida</span>
+                    <span class="badge-desc">Completa la tua prima sfida</span>
+                </div>
+                
+                <div class="badge locked" id="bagde-five">
+                    <span class="badge-icon">🔥</span>
+                    <span class="badge-name">On Fire!</span>
+                    <span class="badge-desc">Completa 10 sfide</span>
+                </div>
+                
+                <div class="badge locked" id="badge-twentyfive">
+                    <span class="badge-icon">👑</span>
+                    <span class="badge-name">Re dei Giochi</span>
+                    <span class="badge-desc">Completa 25 sfide</span>
+                </div>
+
+                <div class="badge locked" id="badge-fifty">
+                    <span class="badge-icon">🏆</span>
+                    <span class="badge-name">Leggenda</span>
+                    <span class="badge-desc">Completa 50 sfide</span>
+                </div>
+
+                <div class="badge locked" id="badge-streak3">
+                    <span class="badge-icon">⚡</span>
+                    <span class="badge-name">Streak x3</span>
+                    <span class="badge-desc">3 giorni consecutivi</span>
+                </div>
+
+                <div class="badge locked" id="badge-streak7">
+                    <span class="badge-icon">🌟</span>
+                    <span class="badge-name">Streak x7</span>
+                    <span class="badge-desc">7 giorni consecutivi</span>
+                </div>
+
+                <div class="badge locked" id="badge-level5">
+                    <span class="badge-icon">🎖️</span>
+                    <span class="badge-name">Livello 5</span>
+                    <span class="badge-desc">Raggiungi il livello 5</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="history-section">
+            <h3 class="section-title">📜 Ultime Sfide Completate</h3>
+            <ul class="history-list" id="history-list">
+                <li class="history-empty">Nessuna sfida completata ancora...</li>
+            </ul>
+        </div>
+
+        <div class="stats-section">
+            <div class="stat-card">
+                <span class="stat-number" id="stat-total">0</span>
+                <span class="stat-label">Sfide Totali</span>
+            </div>
+            
+            <div class="stat-card">
+                <span class="stat-number" id="stat-xp">0</span>
+                <span class="stat-label">XP Totali</span>
+            </div>
+
+            <div class="stat-card">
+                <span class="stat-number" id="stat-best-streak">0</span>
+                <span class="stat-label">Miglior Streak</span>
+            </div>
+
+            <div class="stat-card">
+                <span class="stat-number" id="stat-hard">0</span>
+                <span class="stat-label">Sfide Difficili</span>
+            </div>
+        </div>
+    </div>
+        
+    <div class="countdown">
+        <p>⏱ Nuova sfida tra: <span id="countdown-timer">--:--:--</span></p>
+    </div>
+
+    <div class="reset-section">
+        <button class="btn btn-reset" onclick="resetProgress()">
+            🗑️ Reset Progressi
+        </button>
+    </div>
+    
+    <footer class="footer">
+        <p>Made with 🎮 by <strong>Antecedenza</strong></p>
+    </footer>
+
+    </div>
+
+    <audio id="sound-complete" preload="auto">
+        <source src="success - Sound Effect.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="sound-levelup" preload="auto">
+        <source src="Level Up (Minecraft Sound) - Sound Effect for editing.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="sound-badge" preload="auto">
+        <source src="playstation trophy sound effect (ding).mp3" type="audio/mpeg">
+    </audio>
+      
+    <script src="script.js"></script>
+</body>
+</html>
