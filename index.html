@@ -45,6 +45,7 @@
                 ⛏️ Minecraft
             </button>
             <button class="game-btn" onclick="selectGame('lol')" id="btn-lol">
+                🧙‍♂️ LoL
             <button class="game-btn" onclick="selectGame('cod')" id="btn-cod">
                 💀 CoD     
             </button>
@@ -199,7 +200,13 @@
     <audio id="sound-badge" preload="auto">
         <source src="playstation trophy sound effect (ding).mp3" type="audio/mpeg">
     </audio>
-      
+    
+    <script>
+        setTimeout(function() {
+            document.getElementById('loading-screen').classList.add('hidden');
+        }, 2000);
+    </script>
+    
     <script src="script.js"></script>
 </body>
 </html>
