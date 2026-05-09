@@ -31,6 +31,9 @@
             </div>
         </header>
 
+        <div class="game-selector">
+            <p class="selector-label">Scegli il tuo gioco:</p>
+        </div>
         <div class="game-buttons">
             <button class="game-btn active" onclick="selectGame('tutti')" id="btn-tutti">
                 🎯 Tutti
@@ -46,6 +49,7 @@
             </button>
             <button class="game-btn" onclick="selectGame('lol')" id="btn-lol">
                 🧙‍♂️ LoL
+            </button>
             <button class="game-btn" onclick="selectGame('cod')" id="btn-cod">
                 💀 CoD     
             </button>
@@ -59,11 +63,16 @@
         </div>
         <div class="date-box">
             <p id="today-date">📅 Caricamento...</p>
+            <p class="selected-game" id="selected-game">🎯 Gioco: Tutti</p>
         </div>
-        <div class="challenge-card">
+        <div class="challenge-card" id="challenge-card"> 
+            <div class="challenge-icon" id="challenge-icon">🎯</div>
             <span class="difficulty" id="difficulty">⏳ Caricamento...</span>
             <h2 class="challenge-title" id="challenge-title">Caricamento sfida...</h2>
             <p class="challenge-desc" id="challenge-desc">Attendere...</p>
+            <div class="xp-reward" id="xp-reward">
+                ⭐ Ricompensa: <span id="reward-amount">0</span> XP
+            </div>
         </div>
 
         <div class="success-message" id="success-message">
@@ -107,12 +116,19 @@
                     <span class="badge-desc">Completa la tua prima sfida</span>
                 </div>
                 
-                <div class="badge locked" id="bagde-five">
+                <div class="badge locked" id="badge-five">
                     <span class="badge-icon">🔥</span>
                     <span class="badge-name">On Fire!</span>
                     <span class="badge-desc">Completa 10 sfide</span>
                 </div>
                 
+
+                <div class="badge locked" id="badge-ten">
+                    <span class="badge-icon">💎</span>
+                    <span class="badge-name">Veterano</span>
+                    <span class="badge-desc">Completa 10 sfide</span>
+                </div>
+
                 <div class="badge locked" id="badge-twentyfive">
                     <span class="badge-icon">👑</span>
                     <span class="badge-name">Re dei Giochi</span>
@@ -172,24 +188,22 @@
                 <span class="stat-number" id="stat-hard">0</span>
                 <span class="stat-label">Sfide Difficili</span>
             </div>
+
+            <div class="countdown">
+        <p>⏱ Nuova sfida tra: <span id="countdown-timer">--:--:--</span></p>
+    
+            <div class="reset-section">
+            <button class="btn btn-reset" onclick="resetProgress()">
+            🗑️ Reset Progressi
+            </button>
+        </div>
+    
+        <footer class="footer">
+            <p>Made with 🎮 by <strong>Antecedenza</strong></p>
+        </footer>
         </div>
     </div>
-        
-    <div class="countdown">
-        <p>⏱ Nuova sfida tra: <span id="countdown-timer">--:--:--</span></p>
-    </div>
-
-    <div class="reset-section">
-        <button class="btn btn-reset" onclick="resetProgress()">
-            🗑️ Reset Progressi
-        </button>
-    </div>
-    
-    <footer class="footer">
-        <p>Made with 🎮 by <strong>Antecedenza</strong></p>
-    </footer>
-
-    </div>
+</div>
 
     <audio id="sound-complete" preload="auto">
         <source src="success - Sound Effect.mp3" type="audio/mpeg">
@@ -200,12 +214,6 @@
     <audio id="sound-badge" preload="auto">
         <source src="playstation trophy sound effect (ding).mp3" type="audio/mpeg">
     </audio>
-    
-    <script>
-        setTimeout(function() {
-            document.getElementById('loading-screen').classList.add('hidden');
-        }, 2000);
-    </script>
     
     <script src="script.js"></script>
 </body>

@@ -1,14 +1,19 @@
+// ================================
+// LISTA SFIDE PER OGNI GIOCO
+// ================================
+
 const challenges = {
+
     tutti: [
         {
-            title: "No Heal Challlenge",
+            title: "No Heal Challenge",
             desc: "Gioca un'intera partita senza curarti mai.",
             difficulty: "hard",
             icon: "💀",
             xp: 50
         },
         {
-            title: "Pistola Only", 
+            title: "Pistola Only",
             desc: "Usa solo armi secondarie per tutta la partita.",
             difficulty: "hard",
             icon: "🔫",
@@ -86,7 +91,6 @@ const challenges = {
         }
     ],
 
-    // FORTNITE 
     fortnite: [
         {
             title: "Solo Piccone",
@@ -129,11 +133,9 @@ const challenges = {
             difficulty: "medium",
             icon: "💥",
             xp: 30
-        },
+        }
     ],
-    
-        
-        // VALORANT 
+
     valorant: [
         {
             title: "Ace!",
@@ -147,7 +149,7 @@ const challenges = {
             desc: "Gioca un match intero usando solo la Sheriff.",
             difficulty: "hard",
             icon: "🤠",
-            xp: 50  
+            xp: 50
         },
         {
             title: "Agente Nuovo",
@@ -171,20 +173,19 @@ const challenges = {
             xp: 50
         },
         {
-            title: "Zero morti",
+            title: "Zero Morti",
             desc: "Completa almeno 3 round senza morire.",
             difficulty: "medium",
             icon: "🛡️",
             xp: 30
         }
-    ], 
-    
-    // MINECRAFT
+    ],
+
     minecraft: [
         {
             title: "Speedrun Diamanti",
             desc: "Trova diamanti entro i primi 15 minuti di gioco.",
-            difficulty: "mmedium",
+            difficulty: "medium",
             icon: "💎",
             xp: 30
         },
@@ -205,9 +206,9 @@ const challenges = {
         {
             title: "Vegetariano",
             desc: "Sopravvivi un giorno intero mangiando solo pane e mele.",
-            difficulty: "medium",
+            difficulty: "easy",
             icon: "🍎",
-            xp: 30
+            xp: 10
         },
         {
             title: "Nether Trip",
@@ -224,8 +225,7 @@ const challenges = {
             xp: 50
         }
     ],
-    
-    // LEAGUE OF LEGENDS 
+
     lol: [
         {
             title: "Perfect CS",
@@ -271,7 +271,6 @@ const challenges = {
         }
     ],
 
-    // CALL OF DUTY 
     cod: [
         {
             title: "Nuke Incoming",
@@ -283,6 +282,13 @@ const challenges = {
         {
             title: "Coltello Only",
             desc: "Gioca una partita usando il coltello.",
+            difficulty: "hard",
+            icon: "🔪",
+            xp: 50
+        },
+        {
+            title: "Quick Scope",
+            desc: "Fai 10 kill con il cecchino in quick scope.",
             difficulty: "medium",
             icon: "🎯",
             xp: 30
@@ -310,7 +316,6 @@ const challenges = {
         }
     ],
 
-    // ROCKET LEAGUE
     rocketleague: [
         {
             title: "Aerial Goal",
@@ -353,11 +358,9 @@ const challenges = {
             difficulty: "hard",
             icon: "🌀",
             xp: 50
-        },
+        }
     ],
-    
 
-    // APEX LEGENDS
     apexlegends: [
         {
             title: "Champion!",
@@ -382,13 +385,13 @@ const challenges = {
         },
         {
             title: "Hot Drop",
-            desc: "Aterrate nella zona più calda e sopravvivi.",
+            desc: "Atterrate nella zona più calda e sopravvivi.",
             difficulty: "medium",
             icon: "🔥",
             xp: 30
         },
         {
-            title: "Revive Hero.",
+            title: "Revive Hero",
             desc: "Rianima i tuoi compagni almeno 5 volte.",
             difficulty: "easy",
             icon: "💚",
@@ -396,24 +399,28 @@ const challenges = {
         },
         {
             title: "Solo vs Trio",
-            desc: "Distruggi una squa intera da solo.",
+            desc: "Distruggi una squad intera da solo.",
             difficulty: "hard",
             icon: "😈",
             xp: 50
-        },   
+        }
     ]
 };
 
 
-// VARIABILI GLOBALI 
+// ================================
+// VARIABILI GLOBALI
+// ================================
 
 let selectedGame = 'tutti';
 let currentChallenge = null;
 let isDailyChallenge = true;
-let playerData = {
+let challengeCompleted = false;
+
+let defaultPlayerData = {
     xp: 0,
     level: 1,
-    totalChallenge: 0,
+    totalChallenges: 0,
     hardChallenges: 0,
     streak: 0,
     bestStreak: 0,
@@ -423,24 +430,49 @@ let playerData = {
     unlockedBadges: []
 };
 
-// INIZIALIZZAZIONE 
+let playerData = JSON.parse(JSON.stringify(defaultPlayerData));
+
+
+// ================================
+// INIZIALIZZAZIONE
+// ================================
+
 function init() {
-    loadData();
-    displayDate();
-    generateDailyChallenge();
-    updateXPBar();
-    updateStats();
-    updateBadges();
-    updateHistory();
-    checkStreak();
-    startCountdown();
+    try {
+        loadData();
+        displayDate();
+        generateDailyChallenge();
+        updateXPBar();
+        updateStats();
+        updateBadges();
+        updateHistory();
+        checkStreak();
+        startCountdown();
+        checkSkipCooldown();
+        checkRandomCooldown();
+    } catch (error) {
+        console.error('Errore durante init:', error);
+        // Se c'è un errore, resetta i dati
+        localStorage.clear();
+        playerData = JSON.parse(JSON.stringify(defaultPlayerData));
+        displayDate();
+        generateDailyChallenge();
+        updateXPBar();
+        updateStats();
+        updateHistory();
+        startCountdown();
+    }
 
     setTimeout(function() {
         document.getElementById('loading-screen').classList.add('hidden');
     }, 2000);
 }
 
-// SALVATAGGIO 
+
+// ================================
+// SALVATAGGIO / CARICAMENTO DATI
+// ================================
+
 function saveData() {
     localStorage.setItem('gamingChallengeData', JSON.stringify(playerData));
 }
@@ -448,11 +480,30 @@ function saveData() {
 function loadData() {
     const saved = localStorage.getItem('gamingChallengeData');
     if (saved) {
-        playerData = JSON.parse(saved);
+        try {
+            const parsed = JSON.parse(saved);
+
+            // Controlla che i dati siano validi
+            if (typeof parsed.totalChallenges === 'undefined') {
+                // Dati vecchi/corrotti, resetta
+                console.log('Dati corrotti trovati, reset...');
+                localStorage.clear();
+                playerData = JSON.parse(JSON.stringify(defaultPlayerData));
+            } else {
+                playerData = parsed;
+            }
+        } catch (e) {
+            console.log('Errore parsing dati, reset...');
+            localStorage.clear();
+            playerData = JSON.parse(JSON.stringify(defaultPlayerData));
+        }
     }
 }
 
+
+// ================================
 // DATA DI OGGI
+// ================================
 
 function displayDate() {
     const today = new Date();
@@ -466,7 +517,10 @@ function displayDate() {
     document.getElementById('today-date').textContent = '📅 ' + dateString;
 }
 
+
+// ================================
 // GENERAZIONE SFIDA DEL GIORNO
+// ================================
 
 function generateDailyChallenge() {
     const gameList = challenges[selectedGame];
@@ -476,27 +530,31 @@ function generateDailyChallenge() {
     const index = dayNumber % gameList.length;
 
     currentChallenge = gameList[index];
-
     isDailyChallenge = true;
+    challengeCompleted = false;
 
     displayChallenge(currentChallenge);
-    
-    if (playerData.completedToday && playerData.lastPlayerDate === getTodayString()) {
+
+    if (playerData.completedToday && playerData.lastPlayedDate === getTodayString()) {
         disableCompleteButton();
+        challengeCompleted = true;
     } else {
         enableCompleteButton();
     }
 }
 
-// MOSTRA LA SFIDA  
+
+// ================================
+// MOSTRA LA SFIDA
+// ================================
 
 function displayChallenge(challenge) {
     document.getElementById('challenge-icon').textContent = challenge.icon;
     document.getElementById('challenge-title').textContent = challenge.title;
     document.getElementById('challenge-desc').textContent = challenge.desc;
-    document.getElementById('reward-amount').textContent = challenge-xp;
+    document.getElementById('reward-amount').textContent = challenge.xp;
 
-    const diffEl = document.getElementById('difficulty');
+    var diffEl = document.getElementById('difficulty');
 
     if (challenge.difficulty === 'easy') {
         diffEl.textContent = '🟢 FACILE';
@@ -509,25 +567,28 @@ function displayChallenge(challenge) {
         diffEl.className = 'difficulty hard';
     }
 
-    const card = document.getElementById('challenge-card');
+    var card = document.getElementById('challenge-card');
     card.style.animation = 'none';
     card.offsetHeight;
     card.style.animation = 'slideDown 0.5s ease';
 }
 
-// SELEZIONA GIOCO 
 
-function selectedGame(game) {
+// ================================
+// SELEZIONA GIOCO
+// ================================
+
+function selectGame(game) {
     selectedGame = game;
 
-    const allBtns = document.querySelectorAll('.game-btn');
+    var allBtns = document.querySelectorAll('.game-btn');
     allBtns.forEach(function(btn) {
         btn.classList.remove('active');
     });
 
     document.getElementById('btn-' + game).classList.add('active');
 
-    const gameNames = {
+    var gameNames = {
         tutti: '🎯 Gioco: Tutti',
         fortnite: '🏗️ Gioco: Fortnite',
         valorant: '🔫 Gioco: Valorant',
@@ -539,80 +600,298 @@ function selectedGame(game) {
     };
 
     document.getElementById('selected-game').textContent = gameNames[game];
-    
+
     generateDailyChallenge();
 }
 
-// COMPLETA SFIDA 
+
+// ================================
+// COMPLETA SFIDA
+// ================================
 
 function completeChallenge() {
-    if (isDailyChallenge && playerData.completedToday && playerData.lastPlayerDate === getTodayString()) {
+    // Se questa sfida specifica è già stata completata, blocca
+    if (challengeCompleted) {
         return;
     }
 
-    playerData.xp += currentChallenge.xp;
-
-    playerData.totalChallenges++;
-
-    if (currentChallenge.difficulty === 'hard') {
-        playerData.hardChallenges++
+    // Se è la daily e l'hai già completata oggi, blocca
+    if (isDailyChallenge && playerData.completedToday && playerData.lastPlayedDate === getTodayString()) {
+        return;
     }
 
+    // Segna questa sfida come completata
+    challengeCompleted = true;
+
+    // 1. Aggiungi XP
+    playerData.xp += currentChallenge.xp;
+
+    // 2. Incrementa sfide totali
+    playerData.totalChallenges++;
+
+    // 3. Se era difficile, incrementa il contatore
+    if (currentChallenge.difficulty === 'hard') {
+        playerData.hardChallenges++;
+    }
+
+    // 4. Controlla se sale di livello
     checkLevelUp();
 
+    // 5. Se è la sfida daily, aggiorna lo streak e segna completata
     if (isDailyChallenge) {
         updateStreak();
         playerData.completedToday = true;
         playerData.lastPlayedDate = getTodayString();
     }
 
+    // 6. Aggiungi allo storico
     addToHistory(currentChallenge);
+
+    // 7. Controlla badge
     checkBadges();
+
+    // 8. Aggiorna tutto il display
     updateXPBar();
     updateStats();
     updateBadges();
     updateHistory();
+
+    // 9. Mostra messaggio di successo
     showSuccessMessage();
+
+    // 10. Disabilita il bottone
     disableCompleteButton();
+
+    // 11. Riproduci suono
     playSound('sound-complete');
+
+    // 12. Salva i dati
     saveData();
 }
 
-// SFIDA CASUALE   
+function generateRandomChallenge() {
+    var gameList = challenges[selectedGame];
+    var randomIndex;
 
-function randomChallenge() {
-    const gameList = challenge[selectedGame];
-    let randomIndex;
     do {
         randomIndex = Math.floor(Math.random() * gameList.length);
     } while (gameList[randomIndex].title === currentChallenge.title && gameList.length > 1);
 
     currentChallenge = gameList[randomIndex];
-
     isDailyChallenge = false;
+    challengeCompleted = false;
 
     displayChallenge(currentChallenge);
-
     enableCompleteButton();
 }
 
-// SALTA SFIDA 
+// ================================
+// SFIDA CASUALE
+// ================================
+
+function randomChallenge() {
+    var lastRandom = localStorage.getItem('lastRandomTime');
+
+    if (lastRandom) {
+        var timePassed = Date.now() - parseInt(lastRandom);
+        var thirtyMin = 30 * 60 * 1000;
+
+        if (timePassed <thirtyMin) {
+            return;
+        }
+    }
+
+    localStorage.setItem('lastRandomTime', Date.now().toString());
+
+    var gameList = challenges[selectedGame];
+    var randomIndex;
+
+    do {
+        randomIndex = Math.floor(Math.random() * gameList.length);
+    } while (gameList[randomIndex].title === currentChallenge.title && gameList.length > 1);
+
+    currentChallenge = gameList[randomIndex];
+    isDailyChallenge = false;
+    challengeCompleted = false;
+
+    displayChallenge(currentChallenge);
+    enableCompleteButton();
+
+    startRandomCooldown();
+}
+
+
+// ================================
+// SALTA SFIDA
+// ================================
 
 function skipChallenge() {
-    randomChallenge();
+    var lastSkip = localStorage.getItem('lastSkipTime');
 
-    const card = document.getElementById('challenge-card');
+    if (lastSkip) {
+        var timePassed = Date.now() - parseInt(lastSkip);
+        var threeHours = 3 * 60 * 60 * 1000;
+
+        if (timePassed < threeHours) {
+            return;
+        }
+    }
+
+    localStorage.setItem('lastSkipTime', Date.now().toString());
+
+    var btn = document.getElementById('btn-skip');
+    btn.classList.add('disabled');
+    btn.disabled = true;
+    btn.textContent = '⏭️ Salta (avvio...)';
+
+    var gameList = challenges[selectedGame];
+    var randomIndex;
+
+    do {
+        randomIndex = Math.floor(Math.random() * gameList.length);
+    } while (gameList[randomIndex].title === currentChallenge.title && gameList.length > 1);
+
+    currentChallenge = gameList[randomIndex];
+    isDailyChallenge = false;
+    challengeCompleted = false;
+
+    displayChallenge(currentChallenge);
+    enableCompleteButton();
+
+    var card = document.getElementById('challenge-card');
     card.classList.add('shake');
-
     setTimeout(function() {
         card.classList.remove('shake');
     }, 500);
+
+    setTimeout(function() {
+        startSkipCooldown();
+    }, 100);
 }
 
+function startRandomCooldown() {
+        var btn = document.getElementById('btn-random');
+        btn.classList.add('disabled');
+        btn.disabled = true;
+
+        var cooldownInterval = setInterval(function() {
+            var lastRandom = localStorage.getItem('lastRandomTime');
+
+            if (!lastRandom) {
+                clearInterval(cooldownInterval);
+                enableRandomButton();
+                return;
+            }
+
+            var timePassed = Date.now() - parseInt(lastRandom);
+            var thirtyMin = 30 * 60 * 1000;
+            var timeLeft = thirtyMin - timePassed;
+
+            if (timeLeft <= 0) {
+                clearInterval(cooldownInterval);
+                enableRandomButton();
+            } else {
+                var minutes = Math.floor(timeLeft / (1000 * 60));
+                var seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+                var timeString =
+                    String(minutes).padStart(2, '0') + ':' +
+                    String(seconds).padStart(2, '0');
+
+                btn.innerHTML = '🔁 Sfida Casuale <span class="random-timer">' + timeString + '</span>';
+            }
+        }, 1000);
+    }
+
+function enableRandomButton() {
+        var btn = document.getElementById('btn-random');
+        btn.classList.remove('disabled');
+        btn.disabled = false;
+        btn.textContent = '🔁 Sfida Casuale';
+        localStorage.removeItem('lastRandomTime');
+    }
+
+function checkRandomCooldown() {
+        var lastRandom = localStorage.getItem('lastRandomTime');
+
+        if (lastRandom) {
+            var timePassed = Date.now() - parseInt(lastRandom);
+            var thirtyMin = 30 * 60 * 1000;
+
+            if (timePassed < thirtyMin) {
+                startRandomCooldown();
+            } else {
+                enableRandomButton();
+            }
+        }
+    }
+
+function startSkipCooldown() {
+    var btn = document.getElementById('btn-skip');
+    btn.classList.add('disabled');
+    btn.disabled = true;
+
+    var cooldownInterval = setInterval(function() {
+        var lastSkip = localStorage.getItem('lastSkipTime');
+
+        if (!lastSkip) {
+            clearInterval(cooldownInterval);
+            enableSkipButton();
+            return;
+        }
+
+        var timePassed = Date.now() - parseInt(lastSkip);
+        var threeHours = 3 * 60 * 60 * 1000;
+        var timeLeft = threeHours - timePassed;
+
+        if (timeLeft <= 0) {
+            clearInterval(cooldownInterval);
+            enableSkipButton();
+        } else {
+            var hours = Math.floor(timeLeft / (1000 * 60 * 60));
+            var minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+            var timeString =
+                String(hours).padStart(2, '0') + ':' +
+                String(minutes).padStart(2, '0') + ':' +
+                String(seconds).padStart(2, '0') + '';
+
+            btn.innerHTML = '⏭️ Salta <span class="skip-timer">' + timeString + '</span>';
+        }
+    }, 1000);
+}
+
+function enableSkipButton() {
+    var btn = document.getElementById('btn-skip');
+    btn.classList.remove('disabled');
+    btn.disabled = false;
+    btn.textContent = '⏭️ Salta';
+    localStorage.removeItem('lastSkipTime');
+}
+
+
+function checkSkipCooldown() {
+    var lastSkip = localStorage.getItem('lastSkipTime');
+
+    if (lastSkip) {
+        var timePassed = Date.now() - parseInt(lastSkip);
+        var threeHours = 3 * 60 * 60 * 1000;
+
+        if (timePassed < threeHours) {
+            startSkipCooldown();
+        } else {
+            enableSkipButton();
+        }
+    }
+}
+
+// ================================
 // SISTEMA LIVELLI
+// ================================
 
 function checkLevelUp() {
-    let xpNeeded = playerData.level * 100;
+    var xpNeeded = playerData.level * 100;
 
     while (playerData.xp >= xpNeeded) {
         playerData.xp -= playerData.level * 100;
@@ -627,11 +906,14 @@ function getXPNeeded() {
     return playerData.level * 100;
 }
 
+
+// ================================
 // AGGIORNA BARRA XP
+// ================================
 
 function updateXPBar() {
-    const xpNeeded = getXPNeeded();
-    const percentage = (playerData.xp / xpNeeded) * 100;
+    var xpNeeded = getXPNeeded();
+    var percentage = (playerData.xp / xpNeeded) * 100;
 
     document.getElementById('xp-bar').style.width = percentage + '%';
     document.getElementById('xp-text').textContent = 'XP: ' + playerData.xp + ' / ' + xpNeeded;
@@ -640,10 +922,13 @@ function updateXPBar() {
     updateRank();
 }
 
-// SISTEMA RANGHI 
+
+// ================================
+// SISTEMA RANGHI
+// ================================
 
 function updateRank() {
-    let rankIcon, rankName;
+    var rankIcon, rankName;
 
     if (playerData.level >= 20) {
         rankIcon = '👑';
@@ -666,15 +951,19 @@ function updateRank() {
     document.getElementById('rank-name').textContent = rankName;
 }
 
+
+// ================================
 // SISTEMA STREAK
+// ================================
 
 function checkStreak() {
-    const today = getTodayString();
-    const yesterday = getYesterdayString();
+    var today = getTodayString();
+    var yesterday = getYesterdayString();
 
     if (playerData.lastPlayedDate === yesterday) {
-
+        // Ha giocato ieri, lo streak continua
     } else if (playerData.lastPlayedDate !== today) {
+        // Non ha giocato ieri né oggi, resetta streak
         playerData.streak = 0;
         saveData();
     }
@@ -683,8 +972,8 @@ function checkStreak() {
 }
 
 function updateStreak() {
-    const today = getTodayString();
-    const yesterday = getYesterdayString();
+    var today = getTodayString();
+    var yesterday = getYesterdayString();
 
     if (playerData.lastPlayedDate === yesterday || playerData.lastPlayedDate === null) {
         playerData.streak++;
@@ -699,11 +988,14 @@ function updateStreak() {
     document.getElementById('streak-count').textContent = playerData.streak;
 }
 
-// STORICO SFIDE   
+
+// ================================
+// STORICO SFIDE
+// ================================
 
 function addToHistory(challenge) {
-    const today = new Date();
-    const dateStr = today.getDate() + ' ' + today.toLocaleDateString('it-IT', { month: 'short' });
+    var today = new Date();
+    var dateStr = today.getDate() + ' ' + today.toLocaleDateString('it-IT', { month: 'short' });
 
     playerData.history.unshift({
         date: dateStr,
@@ -717,46 +1009,56 @@ function addToHistory(challenge) {
 }
 
 function updateHistory() {
-    const list = document.getElementById('history-list');
+    var list = document.getElementById('history-list');
 
-    if (playerData.history.length === 0) {
-        list.innerHTML = '<li class="history.empty">Nessuna sfida completata ancora...</li>';
+    if (!playerData.history || playerData.history.length === 0) {
+        list.innerHTML = '<li class="history-empty">Nessuna sfida completata ancora...</li>';
         return;
     }
 
-    let html = '';
+    var html = '';
 
     playerData.history.forEach(function(item) {
         html += '<li class="history-item">';
-        html += ' <span class="history-date">' + item.date + '</span>';
-        html += ' <span class="history-name">' + item.name + '</span>';
-        html += ' <span class="history-xp">' + item.xp + ' XP</span>';
+        html += '  <span class="history-date">' + item.date + '</span>';
+        html += '  <span class="history-name">' + item.name + '</span>';
+        html += '  <span class="history-xp">+' + item.xp + ' XP</span>';
         html += '</li>';
     });
 
     list.innerHTML = html;
 }
 
-// STATISTICHE 
+
+// ================================
+// STATISTICHE
+// ================================
 
 function updateStats() {
-    document.getElementById('stat-total').textContent = playerData.totalChallenges;
-    document.getElementById('stat-xp').textContent = (playerData.level - 1) * 100 + playerData.xp;
-    document.getElementById('stat-best-streak').textContent = playerData.bestStreak;
-    document.getElementById('stat-hard').textContent = playerData.hardChallenges;
+    document.getElementById('stat-total').textContent = playerData.totalChallenges || 0;
+    document.getElementById('stat-xp').textContent = ((playerData.level - 1) * 100 + playerData.xp) || 0;
+    document.getElementById('stat-best-streak').textContent = playerData.bestStreak || 0;
+    document.getElementById('stat-hard').textContent = playerData.hardChallenges || 0;
 }
 
+
+// ================================
 // BADGE / ACHIEVEMENT
+// ================================
 
 function checkBadges() {
-    const badges = [
+    if (!playerData.unlockedBadges) {
+        playerData.unlockedBadges = [];
+    }
+
+    var badges = [
         { id: 'badge-first', condition: playerData.totalChallenges >= 1 },
         { id: 'badge-five', condition: playerData.totalChallenges >= 5 },
         { id: 'badge-ten', condition: playerData.totalChallenges >= 10 },
         { id: 'badge-twentyfive', condition: playerData.totalChallenges >= 25 },
         { id: 'badge-fifty', condition: playerData.totalChallenges >= 50 },
-        { id: 'badge-streak3', condition: playerData.totalChallenges >= 3 },
-        { id: 'badge-streak7', condition: playerData.totalChallenges >= 7 },
+        { id: 'badge-streak3', condition: playerData.streak >= 3 },
+        { id: 'badge-streak7', condition: playerData.streak >= 7 },
         { id: 'badge-level5', condition: playerData.level >= 5 }
     ];
 
@@ -764,13 +1066,15 @@ function checkBadges() {
         if (badge.condition && !playerData.unlockedBadges.includes(badge.id)) {
             playerData.unlockedBadges.push(badge.id);
 
-            const el = document.getElementById('bagde.id');
-            el.classList.remove('locked');
-            el.classList.add('unlocked', 'just-unlocked');
+            var el = document.getElementById(badge.id);
+            if (el) {
+                el.classList.remove('locked');
+                el.classList.add('unlocked', 'just-unlocked');
 
-            setTimeout(function() {
-                el.classList.remove('just-unlocked');
-            }, 600);
+                setTimeout(function() {
+                    el.classList.remove('just-unlocked');
+                }, 600);
+            }
 
             playSound('sound-badge');
         }
@@ -778,8 +1082,13 @@ function checkBadges() {
 }
 
 function updateBadges() {
+    if (!playerData.unlockedBadges) {
+        playerData.unlockedBadges = [];
+        return;
+    }
+
     playerData.unlockedBadges.forEach(function(badgeId) {
-        const el = document.getElementById(badgeId);
+        var el = document.getElementById(badgeId);
         if (el) {
             el.classList.remove('locked');
             el.classList.add('unlocked');
@@ -787,35 +1096,47 @@ function updateBadges() {
     });
 }
 
-// COUNT DOWN ULTIMA SFIDA  
+
+// ================================
+// COUNTDOWN PROSSIMA SFIDA
+// ================================
 
 function startCountdown() {
-    setInterval(function() {
-        const now = new Date();
+    // Aggiorna subito una volta
+    updateCountdown();
 
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        tomorrow.setHours(0, 0, 0, 0);
-
-        const diff = tomorrow - now;
-
-        const hours = Math.floor(fidd / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-        const timeString = 
-            String(hours).padStart(2, '0') + ':' +
-            String(minutes).padStart(2, '0') + ':' +
-            String(seconds).padStart(2, '0');
-        
-        document.getElementById('countdown-timer').textContent = timeString;
-    }, 1000);
+    // Poi ogni secondo
+    setInterval(updateCountdown, 1000);
 }
 
+function updateCountdown() {
+    var now = new Date();
+
+    var tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+
+    var diff = tomorrow - now;
+
+    var hours = Math.floor(diff / (1000 * 60 * 60));
+    var minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    var seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+    var timeString =
+        String(hours).padStart(2, '0') + ':' +
+        String(minutes).padStart(2, '0') + ':' +
+        String(seconds).padStart(2, '0');
+
+    document.getElementById('countdown-timer').textContent = timeString;
+}
+
+
+// ================================
 // MESSAGGIO SUCCESSO
+// ================================
 
 function showSuccessMessage() {
-    const msg = document.getElementById('success-message');
+    var msg = document.getElementById('success-message');
     msg.classList.add('show');
 
     setTimeout(function() {
@@ -823,72 +1144,78 @@ function showSuccessMessage() {
     }, 3000);
 }
 
+
+// ================================
 // BOTTONE COMPLETATA
+// ================================
 
 function disableCompleteButton() {
-    const btn = document.getElementById('btn-complete');
+    var btn = document.getElementById('btn-complete');
     btn.classList.add('disabled');
     btn.textContent = '✅ Già Completata!';
 }
 
 function enableCompleteButton() {
-    const btn = document.getElementById('btn-complete');
+    var btn = document.getElementById('btn-complete');
     btn.classList.remove('disabled');
     btn.textContent = '✅ Completata!';
 }
 
-// SUONI    
+
+// ================================
+// SUONI
+// ================================
 
 function playSound(soundId) {
-    const sound = document.getElementById(soundId);
+    var sound = document.getElementById(soundId);
     if (sound) {
         sound.currentTime = 0;
         sound.play().catch(function() {
-
+            // Ignora errori audio
         });
     }
 }
 
-// RESET 
+
+// ================================
+// RESET PROGRESSI
+// ================================
+
 function resetProgress() {
-    const conferma = confirm('Sei sicuro? Perderai tutti i tuoi progressi!');
+    var conferma = confirm('Sei sicuro? Perderai tutti i tuoi progressi!');
 
     if (conferma) {
-        playerData = {
-            xp: 0,
-            level: 1,
-            totalChallenges: 0,
-            hardChallenges: 0,
-            streak: 0,
-            bestStreak: 0,
-            lastPlayedDate: null,
-            completedToday: false,
-            history: [],
-            unlockedBadges: []
-        };
-
+        playerData = JSON.parse(JSON.stringify(defaultPlayerData));
         saveData();
+        localStorage.removeItem('lastSkipTime');
+        localStorage.removeItem('lastRandomTime');
         location.reload();
     }
 }
 
-// FUNZIONI UTILITA'
+
+// ================================
+// FUNZIONI UTILITÀ
+// ================================
 
 function getTodayString() {
-    const today = new Date();
-    return today.getFullYear() + '-' + 
+    var today = new Date();
+    return today.getFullYear() + '-' +
         String(today.getMonth() + 1).padStart(2, '0') + '-' +
         String(today.getDate()).padStart(2, '0');
 }
 
 function getYesterdayString() {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() -1);
+    var yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
     return yesterday.getFullYear() + '-' +
         String(yesterday.getMonth() + 1).padStart(2, '0') + '-' +
         String(yesterday.getDate()).padStart(2, '0');
 }
 
-// AVVIA TUTTO
+
+// ================================
+// AVVIA TUTTO!
+// ================================
 
 window.addEventListener('DOMContentLoaded', init);
